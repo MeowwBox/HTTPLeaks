@@ -55,6 +55,16 @@
 <!--[if true]>
 <link href="https://leaking.via/conditional-comment-1" rel="stylesheet">
 <![endif]-->
+<!--[if mso]>
+<img src="https://leaking.via/conditional-comment-mso">
+<![endif]-->
+<!--[if gte mso 9]>
+<v:image xmlns:v="urn:schemas-microsoft-com:vml" src="https://leaking.via/conditional-comment-mso-vml-image" style="width:1px;height:1px"/>
+<![endif]-->
+<!--
+[if mso] blocks are invisible to browsers but rendered by Outlook's Word engine, which is why they
+matter for mail sanitizers. [if true] is the classic IE-only form.
+-->
 
 <!-- 
 %Links 
@@ -78,6 +88,24 @@
 <link rel="preload" as="style" href="https://leaking.via/link-preload-as-style" />
 <link rel="preload" as="script" href="https://leaking.via/link-preload-as-script" />
 <link rel="preload" as="track" href="https://leaking.via/link-preload-as-track" />
+<link rel="preload" as="audio" href="https://leaking.via/link-preload-as-audio" />
+<link rel="preload" as="video" href="https://leaking.via/link-preload-as-video" />
+<link rel="preload" as="document" href="https://leaking.via/link-preload-as-document" />
+<link rel="preload" as="worker" href="https://leaking.via/link-preload-as-worker" />
+<link rel="prefetch" as="document" href="https://leaking.via/link-prefetch-as-document" />
+
+<!--
+Compression Dictionary Transport (Chrome 130+, Edge). The dictionary is fetched at idle time with
+low priority once the page has loaded, so wait a moment before concluding it did not fire.
+Subject to connect-src (or default-src) in CSP.
+-->
+<link rel="compression-dictionary" href="https://leaking.via/link-compression-dictionary" />
+
+<!--
+Spatial backdrop (Safari on visionOS, developer preview behind a feature flag as of 2026).
+Both href and environmentmap are URLs.
+-->
+<link rel="spatial-backdrop" href="https://leaking.via/link-spatial-backdrop" environmentmap="https://leaking.via/link-spatial-backdrop-environmentmap" />
 
 <link rel="search" href="https://leaking.via/link-search" />
 <!--
@@ -245,6 +273,42 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
 <script>
 //# sourceMappingURL=https://leaking.via/javascript-source-map
 </script>
+<script type="module" src="https://leaking.via/script-module-src"></script>
+<script type="module">
+import "https://leaking.via/script-module-static-import";
+</script>
+<!--
+A static import in an inline module script is a declarative fetch: it is resolved and requested
+before any code in the module runs.
+-->
+
+<!--
+%Speculation Rules
+-->
+<script type="speculationrules">
+{
+  "prefetch": [
+    { "source": "list", "urls": ["https://leaking.via/speculationrules-prefetch"], "eagerness": "immediate" }
+  ],
+  "prerender": [
+    { "source": "list", "urls": ["https://leaking.via/speculationrules-prerender"], "eagerness": "immediate" }
+  ]
+}
+</script>
+<script type="speculationrules">
+{
+  "prefetch": [
+    { "source": "document", "where": { "href_matches": "https://leaking.via/*" }, "eagerness": "moderate" }
+  ]
+}
+</script>
+<a href="https://leaking.via/speculationrules-document-rule-hover">Hover me (document rule, moderate eagerness)</a>
+<!--
+Chromium 109+ (prerender) and 110+ (prefetch). This is JSON, not script, so it is honored even where
+script execution is otherwise refused. Only acted upon in the main frame, not in subframes.
+Cross-site prefetch/prerender is subject to additional restrictions (no credentials, storage
+partitioning) but the request still leaves the browser.
+-->
 
 <!--
 %Frames
@@ -252,6 +316,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
 <iframe src="https://leaking.via/iframe-src"></iframe>
 <iframe src="data:image/svg+xml,<svg%20xmlns='%68ttp:%2f/www.w3.org/2000/svg'%20xmlns:xlink='%68ttp:%2f/www.w3.org/1999/xlink'><image%20xlink:hr%65f='%68ttps:%2f/leaking.via/svg-via-data'></image></svg>"></iframe>
 <iframe srcdoc="<img src=https://leaking.via/iframe-srcdoc-img-src>"></iframe>
+<iframe src="data:text/html,<img src=https://leaking.via/iframe-data-text-html-img-src>"></iframe>
 <frameset>
     <frame src="https://leaking.via/frame-src"></frame>
 </frameset>
@@ -259,6 +324,52 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
 <iframe src="javascript:'&lt;img src=https://leaking.via/iframe-javascript-src&gt;'"></iframe>
 <iframe src="javascript:'&lt;iframe src=&quot;javascript:\&apos;&lt;img src=https://leaking.via/iframe-javascript-src-2&gt;\&apos;&quot;&gt;&lt;/iframe&gt;'"></iframe>
 <iframe src="javascript:atob('PGltZyBzcmM9Imh0dHBzOi8vbGVha2luZy52aWEvaWZyYW1lLWphdmFzY3JpcHQtc3JjLTMiPg==')"></iframe>
+
+<!--
+%Declarative Shadow DOM
+-->
+<div>
+    <template shadowrootmode="open">
+        <img src="https://leaking.via/declarative-shadow-dom-img-src">
+        <style>:host { background: url(https://leaking.via/declarative-shadow-dom-css-background); }</style>
+    </template>
+</div>
+<div>
+    <template shadowrootmode="closed">
+        <img src="https://leaking.via/declarative-shadow-dom-closed-img-src">
+    </template>
+</div>
+<!--
+A <template> is normally inert, but with shadowrootmode (Chrome 111+, Safari 16.4+, Firefox 123+)
+the parser attaches its content as a live shadow root at parse time. Sanitizers and mailers that
+treat template contents as inert miss this. The legacy attribute name was shadowroot.
+-->
+
+<!--
+%Noscript
+-->
+<noscript>
+    <img src="https://leaking.via/noscript-img-src">
+    <link rel="stylesheet" href="https://leaking.via/noscript-link-stylesheet">
+    <iframe src="https://leaking.via/noscript-iframe-src"></iframe>
+</noscript>
+<!--
+Fires wherever scripting is disabled: mail clients, reader modes, server-side DOMs, browsers with
+JavaScript turned off. Contents are inert text in a browser with scripting on, so a check that only
+runs with scripting enabled will report a false negative.
+-->
+
+<!--
+%Model
+-->
+<model src="https://leaking.via/model-src" environmentmap="https://leaking.via/model-environmentmap" poster="https://leaking.via/model-poster">
+    <source src="https://leaking.via/model-source-src" type="model/vnd.usdz+zip">
+    <img src="https://leaking.via/model-fallback-img-src" alt="fallback">
+</model>
+<!--
+HTML <model> element: Safari 26 on visionOS, Safari 27 on iOS, iPadOS and macOS. src and <source src>
+load the 3D asset, environmentmap loads an HDR/EXR lighting image, poster is in the draft spec.
+-->
 
 <!-- 
 %Menu
@@ -301,8 +412,39 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
         -webkit-mask-box-image: url(https://leaking.via/css--webkit-mask-box-image);
         -webkit-mask-box-image-source: url(https://leaking.via/css--webkit-mask-box-image-source);
         cursor: url(https://leaking.via/css-cursor), auto;
+        mask: url(https://leaking.via/css-mask);
+        mask-image: url(https://leaking.via/css-mask-image);
+        mask-border-source: url(https://leaking.via/css-mask-border-source);
+        filter: url(https://leaking.via/css-filter#foo);
+        backdrop-filter: url(https://leaking.via/css-backdrop-filter#foo);
+        clip-path: url(https://leaking.via/css-clip-path#foo);
+        offset-path: url(https://leaking.via/css-offset-path#foo);
+    }
+    big {
+        background-image: image-set(url(https://leaking.via/css-image-set) 1x);
+        background-image: -webkit-image-set(url(https://leaking.via/css--webkit-image-set) 1x);
+        background-image: cross-fade(url(https://leaking.via/css-cross-fade-1), url(https://leaking.via/css-cross-fade-2), 50%);
+        background-image: -webkit-cross-fade(url(https://leaking.via/css--webkit-cross-fade-1), url(https://leaking.via/css--webkit-cross-fade-2), 50%);
+        content: image-set("https://leaking.via/css-content-image-set-string" 1x);
+    }
+    big {
+        background: URL(https://leaking.via/css-url-uppercase);
+        background: url( "https://leaking.via/css-url-quoted-spaced" );
+        background: url(  https://leaking.via/css-url-leading-space  );
+        background: url('https://leaking.via/css-url-single-quoted');
+        background: url("https://leaking.via/css-url-\
+newline-escaped");
+        background: src("https://leaking.via/css-src-function");
     }
 </style>
+<!--
+Later declarations win, so with a real network observer you will see only the last value of each
+property fire; split them into separate rules or elements when you need every one to fire.
+mask, mask-image and mask-border-source are unprefixed in Chromium 120+; filter, clip-path,
+mask and offset-path with url() fetch the referenced external SVG even when the fragment does
+not resolve. src() is the CSS Values 4 alias of url() and is not implemented anywhere as of 2026;
+it is listed for sanitizer testing.
+-->
 <big>DEF</big>
 <style>
     /* Basic font-face */
@@ -354,10 +496,29 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
     }
     s::after {
       content: attr(foo url);
-    }    
+    }
+    s::after {
+      content: attr(foo type(<url>));
+    }
     s::before {
       content: attr(notpresent, url(https://leaking.via/css-attr-fallback));
     }
+    s {
+      --attr-url: attr(foo);
+      background-image: image-set(var(--attr-url) 1x);
+      background-image: image-set(attr(foo) 1x);
+    }
+    /*
+    The two image-set() lines probe attr() tainting: a string that originated in attr() must not be
+    usable as a URL even after passing through a custom property or the string form of image-set().
+    Expected: no request.
+    */
+    /*
+    attr(foo url) is the CSS Values 3 syntax and never shipped. The CSS Values 5 syntax
+    attr(foo type(<url>)) shipped in Chromium 133+ but url is deliberately excluded from the
+    allowed types (it is treated as invalid at computed-value time) precisely to prevent this
+    leak. Both are kept as regression probes. The fallback form does fire.
+    */
 </style>
 <style>
     p#p1 {
@@ -388,6 +549,10 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
         -webkit-mask-box-image: url(https://leaking.via/inline-css--webkit-mask-box-image);
         -webkit-mask-box-image-source: url(https://leaking.via/inline-css--webkit-mask-box-image-source);
         cursor: url(https://leaking.via/inline-css-cursor), auto;
+        mask-image: url(https://leaking.via/inline-css-mask-image);
+        filter: url(https://leaking.via/inline-css-filter#foo);
+        clip-path: url(https://leaking.via/inline-css-clip-path#foo);
+        background-image: image-set(url(https://leaking.via/inline-css-image-set) 1x);
 ">MNO</b>
 
 <svg>
@@ -463,6 +628,32 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
     <font-face-uri xlink:href="https://leaking.via/svg-font-face-uri" />
 </svg>
 
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <use href="https://leaking.via/svg-use-href#foo" />
+    <use xlink:href="https://leaking.via/svg-use-xlink-href#foo" />
+</svg>
+<!--
+External <use> references. Browsers only honor same-origin targets, but the fetch is issued before
+that decision in Firefox; verify per engine whether a cross-origin request leaves the browser.
+-->
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <feImage href="https://leaking.via/svg-feimage-href" />
+    <a href="https://leaking.via/svg-a-href/"><text transform="translate(0,20)">CLICKME (SVG2 href)</text></a>
+    <image>
+        <animate attributeName="href" begin="0s" from="#" to="https://leaking.via/svg-image-animate-href" />
+    </image>
+</svg>
+<!--
+SVG2 dropped the xlink: prefix; every xlink:href leak above also works as a plain href.
+-->
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <foreignObject width="10" height="10">
+        <img xmlns="http://www.w3.org/1999/xhtml" src="https://leaking.via/svg-foreignobject-img-src" />
+    </foreignObject>
+</svg>
+
 <!--
 %XSLT Stylesheets
 -->
@@ -505,6 +696,38 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-ping
 <math xlink:href="https://leaking.via/mathml-math">CLICKME</math>
 
 <math><mi xlink:href="https://leaking.via/mathml-mi">CLICKME</mi></math>
+
+<math href="https://leaking.via/mathml-math-href">CLICKME</math>
+
+<math><mi href="https://leaking.via/mathml-mi-href">CLICKME</mi></math>
+<!--
+MathML Core (Chromium 109+, Firefox, Safari) uses a plain href attribute on every element; the
+xlink:href form is the pre-Core Firefox syntax.
+-->
+
+<!--
+%URL forms
+-->
+<img src="//leaking.via/url-protocol-relative">
+<img src="\\leaking.via\url-unc-path\x.png">
+<img src="file://leaking.via/url-file-unc/x.png">
+<img src="https:\\leaking.via\url-backslash-authority">
+<img src="https:/leaking.via/url-single-slash">
+<img src="  https://leaking.via/url-leading-whitespace">
+<img src="ht&#x09;tps://leaking.via/url-tab-in-scheme">
+<img src="ht&#10;tps://leaking.via/url-newline-in-scheme">
+<img src="HTTPS://LEAKING.VIA/url-uppercase-scheme">
+<img src="https://leaking.via:443/url-explicit-port">
+<img src="https://user:pass@leaking.via/url-userinfo">
+<img src="https://leaking%2evia/url-percent-encoded-host">
+<img src="https://leaking.via./url-trailing-dot-host">
+<img src="https://%6c%65%61%6b%69%6e%67.via/url-percent-encoded-host-2">
+<!--
+Not new elements, but the URL spellings sanitizers and proxies most often fail to recognize as
+external. The UNC and file: forms matter for Outlook and legacy IE, where they trigger an SMB
+connection (and an NTLM handshake) rather than an HTTP request. Tab and newline inside the scheme
+are stripped by the URL parser, so the request goes out as https://.
+-->
 
 </body>
 </html>
